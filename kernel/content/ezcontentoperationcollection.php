@@ -809,7 +809,11 @@ class eZContentOperationCollection
         }
         if ( $locationAdded )
         {
-
+            eZAudit::writeAudit( 'location-assign', array( 'Main Node ID' => $object->attribute( 'main_node_id' ),
+                                                           'Content object ID' => $object->attribute( 'id' ),
+                                                           'Content object name' => $object->attribute( 'name' ),
+                                                           'New Locations Parent Node ID Array' => implode( ', ' , $selectedNodeIDArray ),
+                                                           'Comment' => 'Assigned new locations to the current node: eZContentOperationCollection::addAssignment()' ) );
             //call appropriate method from search engine
             eZSearch::addNodeAssignment( $nodeID, $objectID, $selectedNodeIDArray );
 
@@ -845,7 +849,7 @@ class eZContentOperationCollection
 
         $db = eZDB::instance();
         $db->begin();
-
+        $auditInfoArray = array();
         foreach ( $removeNodeIdList as $nodeId )
         {
             $node     = eZContentObjectTreeNode::fetch($nodeId);
@@ -859,6 +863,11 @@ class eZContentOperationCollection
                     $nodeAssignmentIdList[$nodeAssignment['id']] = 1;
                 }
             }
+            $auditInfoArray[$nodeId] = array( 'Removed Node ID' => $nodeId,
+                                              'Parent Node ID' => $node->attribute( 'parent_node_id' ),
+                                              'Content object ID' => $objectId,
+                                              'Content object name' => $node->attribute( 'name' ),
+                                              'Old Main Node ID' => $node->attribute( 'main_node_id' ) );
 
             if ( $nodeId == $node->attribute( 'main_node_id' ) )
                 $mainNodeChanged[$objectId] = 1;
@@ -879,6 +888,15 @@ class eZContentOperationCollection
                 $mainNodeChanged[$objectId] = $allNodes[0];
                 eZContentObjectTreeNode::updateMainNodeID( $allNodes[0]->attribute( 'node_id' ), $objectId, false, $allNodes[0]->attribute( 'parent_node_id' ) );
             }
+        }
+        foreach( $auditInfoArray as $auditInfo )
+        {
+            if( isset( $mainNodeChanged[$auditInfo['Content object ID']] ) && $mainNodeChanged[$auditInfo['Content object ID']] instanceof eZContentObjectTreeNode )
+                $auditInfo['New Main Node ID'] = $mainNodeChanged[$auditInfo['Content object ID']]->attribute( 'node_id' );
+            else
+                $auditInfo['New Main Node ID'] = $auditInfo['Old Main Node ID'];
+            $auditInfo['Comment'] = 'Removed a location of the current node: eZContentOperationCollection::removeNodes()';
+            eZAudit::writeAudit( 'location-remove', $auditInfo );
         }
 
         // Give other search engines that the default one a chance to reindex

@@ -66,6 +66,27 @@ class eZAudit
         if ( !isset( $auditNameSettings[$auditName] ) )
             return false;
 
+        switch( $auditName )
+        {
+            case 'main-node-update':
+            {
+                $db = eZDB::instance();
+                $oldMainNodeArray = $db->arrayQuery(
+                    "SELECT  main_node_id, parent_node_id, ezcontentobject.name AS name FROM ezcontentobject_tree " .
+                    "INNER JOIN eznode_assignment ON eznode_assignment.contentobject_id = ezcontentobject_tree.contentobject_id " .
+                    "INNER JOIN ezcontentobject ON ezcontentobject.id = ezcontentobject_tree.contentobject_id " .
+                    "WHERE ezcontentobject_tree.contentobject_id = {$auditAttributes['Content object ID']} " .
+                    "AND eznode_assignment.is_main = 1 " .
+                    "AND eznode_assignment.parent_node = ezcontentobject_tree.parent_node_id " .
+                    "AND ezcontentobject.current_version = eznode_assignment.contentobject_version" );
+                $auditAttributes['Old Main Node ID'] = $oldMainNodeArray[0]['main_node_id'];
+                $auditAttributes['Old Main Parent Node ID'] = $oldMainNodeArray[0]['parent_node_id'];
+                $auditAttributes['Content object name'] = $oldMainNodeArray[0]['name'];
+            } break;
+
+            default:
+        }
+
         $ip = eZSys::clientIP();
         if ( !$ip )
             $ip = eZSys::serverVariable( 'HOSTNAME', true );
