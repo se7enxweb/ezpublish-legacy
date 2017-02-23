@@ -863,6 +863,16 @@ class eZContentOperationCollection
                     $nodeAssignmentIdList[$nodeAssignment['id']] = 1;
                 }
             }
+
+            $isMainNode = $nodeId == $node->attribute( 'main_node_id' );
+
+            eZAudit::writeAudit( 'location-remove', array( 'Removed Node ID' => $nodeId,
+                                                           'Parent Node ID' => $node->attribute( 'parent_node_id' ),
+                                                           'Content object ID' => $objectId,
+                                                           'Content object name' => $node->attribute( 'name' ),
+                                                           'Was main node' => $isMainNode ? 'Yes' : 'No'
+            ) );
+
             $auditInfoArray[$nodeId] = array( 'Removed Node ID' => $nodeId,
                                               'Parent Node ID' => $node->attribute( 'parent_node_id' ),
                                               'Content object ID' => $objectId,
@@ -886,6 +896,15 @@ class eZContentOperationCollection
             if ( isset( $allNodes[0] ) )
             {
                 $mainNodeChanged[$objectId] = $allNodes[0];
+
+                // audit entry needs to happen before we actually update the main node assignment
+                // because we want to log the old main_node_id
+                eZAudit::writeAudit( 'main-node-update', array( 'Content object ID' => $objectId,
+                                                                'New Main Node ID' => $allNodes[0]->attribute( 'node_id' ),
+                                                                'New Parent Node ID' => $allNodes[0]->attribute( 'parent_node_id' ),
+                                                                'Comment' => 'Updated the main location of the current object: eZContentOperationCollection::removeNodes()' )
+                );
+
                 eZContentObjectTreeNode::updateMainNodeID( $allNodes[0]->attribute( 'node_id' ), $objectId, false, $allNodes[0]->attribute( 'parent_node_id' ) );
             }
         }
@@ -1262,6 +1281,13 @@ class eZContentOperationCollection
      */
     static public function updateMainAssignment( $mainAssignmentID, $ObjectID, $mainAssignmentParentID )
     {
+        eZAudit::writeAudit( 'main-node-update', array( 'Content object ID' => $ObjectID,
+                                                        'New Main Node ID' => $mainAssignmentID,
+                                                        'New Parent Node ID' => $mainAssignmentParentID,
+                                                        'Old Main Node ID' => '',
+                                                        'Old Main Parent Node ID' => '',
+                                                        'Content object name' => '',
+                                                        'Comment' => 'Updated the main location of the current object: eZContentObjectTreeNode::updateMainNodeID()' ) );
         eZContentObjectTreeNode::updateMainNodeID( $mainAssignmentID, $ObjectID, false, $mainAssignmentParentID );
         eZContentCacheManager::clearContentCacheIfNeeded( $ObjectID );
         eZContentOperationCollection::registerSearchObject( $ObjectID );

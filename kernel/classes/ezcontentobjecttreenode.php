@@ -2888,15 +2888,6 @@ class eZContentObjectTreeNode extends eZPersistentObject
 
         $db = eZDB::instance();
         $db->begin();
-
-        eZAudit::writeAudit( 'main-node-update', array( 'Content object ID' => $objectID,
-                                                        'New Main Node ID' => $mainNodeID,
-                                                        'New Parent Node ID' => $parentMainNodeID,
-                                                        'Old Main Node ID' => '',
-                                                        'Old Main Parent Node ID' => '',
-                                                        'Content object name' => '',
-                                                        'Comment' => 'Updated the main location of the current object: eZContentObjectTreeNode::updateMainNodeID()' ) );
-
         $db->query( "UPDATE ezcontentobject_tree SET main_node_id=$mainNodeID WHERE contentobject_id=$objectID" );
         if ( !$version )
         {
@@ -2915,6 +2906,7 @@ class eZContentObjectTreeNode extends eZPersistentObject
         }
 
         $db->commit();
+
     }
 
     function fetchByCRC( $pathStr )
