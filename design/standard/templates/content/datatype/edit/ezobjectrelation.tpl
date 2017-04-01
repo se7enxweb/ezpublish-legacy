@@ -76,8 +76,9 @@
 {/if}
 </div>
 <div class="right">
-    <input type="text" class="halfbox hide ezobject-relation-search-text" />
-    <input type="submit" class="button hide ezobject-relation-search-btn" name="CustomActionButton[{$attribute.id}_browse_object]" value="{'Find object'|i18n( 'design/standard/content/datatype' )}" />
+    <input type="text" class="halfbox" name="CustomActionData_{$attribute.id}[searchText]" />
+    <input type="submit" class="button ezobject-relation-search-button" name="CustomActionButton[{$attribute.id}_search_object]" value="{'Search'|i18n( 'design/standard/content/datatype' )}" title="{'Search and add an existing object in this relation'|i18n( 'design/standard/content/datatype' )}" />
+    {* <input type="submit" class="button hide ezobject-relation-search-btn" name="CustomActionButton[{$attribute.id}_browse_object]" value="{'Find object'|i18n( 'design/standard/content/datatype' )}" /> *}
 </div>
 <div class="break"></div>
 <div class="block inline-block ezobject-relation-search-browse hide"></div>
@@ -101,7 +102,7 @@
                          fetch( 'content', 'list',
                                 hash( 'parent_node_id', $parent_node.node_id,
                                       'sort_by', $parent_node.sort_array )
-                                     ) )
+                                     )
                         )}
 <select id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}" class="ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" name="{$attribute_base}_data_object_relation_id_{$attribute.id}">
 {if $attribute.contentclass_attribute.is_required|not}

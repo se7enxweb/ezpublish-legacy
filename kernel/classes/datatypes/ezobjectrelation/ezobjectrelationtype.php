@@ -405,6 +405,43 @@ class eZObjectRelationType extends eZDataType
                 }
             } break;
 
+            case 'search_object':
+            {
+                $module = $parameters['module']; /** @var $module eZModule */
+                $attributeId = $contentObjectAttribute->attribute( 'id' );
+
+                $browseOptions = array(
+                    'action_name' => 'AddRelatedObject_' . $attributeId,
+                    'type' => 'AddRelatedObjectToDataType',
+                    'browse_custom_action' => array (
+                        'name' => 'CustomActionButton['. $attributeId .'_set_object_relation]',
+                        'value' => $attributeId,
+                    ),
+                    'from_page' => $parameters[ 'current-redirection-uri' ],
+                    'selection' => 'single',
+                    'return_type' => 'ObjectID',
+                    'custom_action_data' => array(),
+                    'description_template' => null,
+                    'start_node' => 2,
+                    'class_array' => $this->getAllowedContentClasses( $contentObjectAttribute ),
+                    'permission' => '',
+                    'cancel_page' => false,
+					'ignore_nodes_select_subtree' => array(),
+                    'ignore_nodes_click' => array(),
+                );
+
+                $http = eZHTTPTool::instance();
+                $http->setSessionVariable( 'BrowseParameters', $browseOptions );
+
+                $searchUrl =
+                    '/content/search?' .
+                    'SearchText=' . $_REQUEST[ 'CustomActionData_' . $attributeId ][ 'searchText' ] .
+                    '&SubTreeArray=2&SearchButton=Search&Mode=browse&BrowsePageLimit=25&SectionID=-1&SubTreeArray=2';
+
+                $module->redirectTo( $searchUrl );
+            }
+            break;
+
             case "browse_object" :
             {
                 $module = $parameters['module'];
@@ -436,23 +473,7 @@ class eZObjectRelationType extends eZDataType
                         $browseParameters['start_node'] = eZContentBrowse::nodeAliasID( $nodePlacement[$contentObjectAttribute->attribute( 'id' )] );
                 }
 
-                // Fetch the list of "allowed" classes .
-                // A user can select objects of only those allowed classes when browsing.
-                $classAttribute = $contentObjectAttribute->attribute( 'contentclass_attribute' );
-                $classContent   = $classAttribute->content();
-                if ( isset( $classContent['class_constraint_list'] ) )
-                {
-                    $classConstraintList = $classContent['class_constraint_list'];
-                }
-                else
-                {
-                    $classConstraintList = array();
-                }
-
-                if ( count($classConstraintList) > 0 )
-                {
-                    $browseParameters['class_array'] = $classConstraintList;
-                }
+				$browseParameters[ 'class_array' ] = $this->getAllowedContentClasses( $contentObjectAttribute );
 
                 eZContentBrowse::browse( $browseParameters,
                                          $module );
@@ -814,6 +835,30 @@ class eZObjectRelationType extends eZDataType
     }
 
     /// \privatesection
+
+	/**
+     * Fetch the list of "allowed" classes. A user can select objects of
+     * only those allowed classes when browsing.
+     *
+	 * @param eZContentAttribute $contentObjectAttribute
+	 * @return array
+	 */
+    private function getAllowedContentClasses( eZContentObjectAttribute $contentObjectAttribute )
+    {
+		$classConstraintList = false;
+
+		$classAttribute = $contentObjectAttribute->attribute( 'contentclass_attribute' );
+		$classContent = $classAttribute->content();
+		if(
+		    is_array( $classContent[ 'class_constraint_list' ] ) &&
+            !empty( $classContent[ 'class_constraint_list' ] )
+        )
+		{
+			$classConstraintList = $classContent[ 'class_constraint_list' ];
+		}
+
+		return $classConstraintList;
+    }
 }
 
 eZDataType::register( eZObjectRelationType::DATA_TYPE_STRING, "eZObjectRelationType" );
