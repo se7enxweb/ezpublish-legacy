@@ -149,32 +149,22 @@ class eZXMLTextType extends eZDataType
     function onPublish( $contentObjectAttribute, $object, $publishedNodes )
     {
         $currentVersion = $object->currentVersion();
-        $langMask = $currentVersion->attribute( 'language_mask' );
 
-        // We find all translations present in the current version. We calculate
-        // this from the language mask already present in the fetched version,
-        // so no further round-trip to the DB is required.
-        $languageList = eZContentLanguage::decodeLanguageMask( $langMask, true );
-        $languageList = $languageList['language_list'];
-
-        // We want to have the class attribute identifier of the attribute
-        // containing the current ezxmltext, as we then can use the more efficient
-        // eZContentObject->fetchAttributesByIdentifier() to get the data
-        $identifier = $contentObjectAttribute->attribute( 'contentclass_attribute_identifier' );
-
-		$attributeArray = eZPersistentObject::fetchObjectList(
-		    eZContentObjectAttribute::definition(),
-			null,
-			array(
-			    'data_type_string' => 'ezxmltext',
-				'contentobject_id' => $object->ID,
-				'version' => $currentVersion->attribute( 'version' ),
+        //Fetches all ezxmltext attributes for the given object
+        $attributeArray = eZPersistentObject::fetchObjectList(
+            eZContentObjectAttribute::definition(),
+            null,
+            array(
+                'data_type_string' => 'ezxmltext',
+                'contentobject_id' => $object->ID,
+                'version' => $currentVersion->attribute( 'version' ),
             ),
-			null,
-			null,
-			true );
+            null,
+            null,
+            true );
 
-		foreach ( $attributeArray as $attribute )
+        // builds a list of object relations
+        foreach ( $attributeArray as $attribute )
         {
             $xmlText = eZXMLTextType::rawXMLText( $attribute );
 
@@ -219,11 +209,12 @@ class eZXMLTextType extends eZDataType
             }
         }
 
-		if ( !empty( $linkedObjectIdArray ) || !empty( $embeddedObjectIdArray ) )
-		{
-			$object->commitInputRelations( $currentVersion->attribute( 'version' ) );
-		}
-	}
+        // write object relations for this version
+        if ( !empty( $linkedObjectIdArray ) || !empty( $embeddedObjectIdArray ) )
+        {
+            $object->commitInputRelations( $currentVersion->attribute( 'version' ) );
+        }
+    }
 
     /**
      * Extracts ids of embedded/linked objects in an eZXML DOMNodeList
