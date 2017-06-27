@@ -162,11 +162,19 @@ class eZXMLTextType extends eZDataType
         // eZContentObject->fetchAttributesByIdentifier() to get the data
         $identifier = $contentObjectAttribute->attribute( 'contentclass_attribute_identifier' );
 
-        $attributeArray = $object->fetchAttributesByIdentifier( array( $identifier ),
-                                                                $currentVersion->attribute( 'version' ),
-                                                                $languageList );
+		$attributeArray = eZPersistentObject::fetchObjectList(
+		    eZContentObjectAttribute::definition(),
+			null,
+			array(
+			    'data_type_string' => 'ezxmltext',
+				'contentobject_id' => $object->ID,
+				'version' => $currentVersion->attribute( 'version' ),
+            ),
+			null,
+			null,
+			true );
 
-        foreach ( $attributeArray as $attribute )
+		foreach ( $attributeArray as $attribute )
         {
             $xmlText = eZXMLTextType::rawXMLText( $attribute );
 
@@ -209,13 +217,13 @@ class eZXMLTextType extends eZDataType
             {
                 $object->appendInputRelationList( $linkedObjectIdArray, eZContentObject::RELATION_LINK );
             }
-            if ( !empty( $linkedObjectIdArray ) || !empty( $embeddedObjectIdArray ) )
-            {
-                $object->commitInputRelations( $currentVersion->attribute( 'version' ) );
-            }
-
         }
-    }
+
+		if ( !empty( $linkedObjectIdArray ) || !empty( $embeddedObjectIdArray ) )
+		{
+			$object->commitInputRelations( $currentVersion->attribute( 'version' ) );
+		}
+	}
 
     /**
      * Extracts ids of embedded/linked objects in an eZXML DOMNodeList
