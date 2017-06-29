@@ -164,6 +164,7 @@ class eZXMLTextType extends eZDataType
             true );
 
         // builds a list of object relations
+        $foundObjectRelations = false;
         foreach ( $attributeArray as $attribute )
         {
             $xmlText = eZXMLTextType::rawXMLText( $attribute );
@@ -192,6 +193,12 @@ class eZXMLTextType extends eZDataType
             // linked objects
             $linkedObjectIdArray = $this->getRelatedObjectList( $dom->getElementsByTagName( 'link' ) );
 
+            if ( !empty( $linkedObjectIdArray ) )
+            {
+                $foundObjectRelations = true;
+                $object->appendInputRelationList( $linkedObjectIdArray, eZContentObject::RELATION_LINK );
+            }
+
             // embedded objects
             $embeddedObjectIdArray = array_merge(
                 $this->getRelatedObjectList( $dom->getElementsByTagName( 'embed' ) ),
@@ -200,17 +207,13 @@ class eZXMLTextType extends eZDataType
 
             if ( !empty( $embeddedObjectIdArray ) )
             {
+                $foundObjectRelations = true;
                 $object->appendInputRelationList( $embeddedObjectIdArray, eZContentObject::RELATION_EMBED );
-            }
-
-            if ( !empty( $linkedObjectIdArray ) )
-            {
-                $object->appendInputRelationList( $linkedObjectIdArray, eZContentObject::RELATION_LINK );
             }
         }
 
         // write object relations for this version
-        if ( !empty( $linkedObjectIdArray ) || !empty( $embeddedObjectIdArray ) )
+        if ( $foundObjectRelations )
         {
             $object->commitInputRelations( $currentVersion->attribute( 'version' ) );
         }
