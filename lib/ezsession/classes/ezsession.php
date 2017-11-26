@@ -514,6 +514,7 @@ class eZSession
         }
         $_SESSION = array();
         session_destroy();
+        setcookie( session_name(), "", time()-3600, '/');
         self::$hasStarted = false;
         self::$handlerInstance = null;
         return true;

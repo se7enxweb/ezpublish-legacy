@@ -1087,8 +1087,8 @@ WHERE user_id = '" . $userID . "' AND
             self::cleanup();
         }
 
-        // give user new session id
-        eZSession::regenerate();
+        // drop session
+        eZSession::remove();
 
         // set the property used to prevent SSO from running again
         self::$userHasLoggedOut = true;

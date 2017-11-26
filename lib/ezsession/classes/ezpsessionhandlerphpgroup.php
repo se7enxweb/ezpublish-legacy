@@ -15,7 +15,7 @@
  * @package lib
  * @subpackage ezsession
  */
-class ezpSessionHandlerPHP extends ezpSessionHandler
+class ezpSessionHandlerPHPGroup extends ezpSessionHandlerPHP
 {
     /**
      * reimp (Does nothing, lets php handle sessions)
@@ -57,6 +57,7 @@ class ezpSessionHandlerPHP extends ezpSessionHandler
      */
     public function destroy( $sessionId )
     {
+        session_destroy();
         ezpEvent::getInstance()->notify( 'session/destroy', array( $sessionId ) );
         return false;
     }
@@ -66,9 +67,31 @@ class ezpSessionHandlerPHP extends ezpSessionHandler
      */
     public function regenerate( $updateBackendData = true )
     {
+        /*
         $oldSessionId = session_id();
         session_regenerate_id( $updateBackendData );
         $newSessionId = session_id();
+        */
+
+        if( $updateBackendData )
+        {
+            session_destroy();
+        }
+
+        $oldSessionId = session_id();
+
+        $hash = self::getUserHash();
+
+        if( $hash )
+        {
+            session_id( $hash );
+            $newSessionId = session_id();
+            session_start();
+        }
+        else
+        {
+            return false;
+        }
 
         ezpEvent::getInstance()->notify( 'session/regenerate', array( $oldSessionId, $newSessionId ) );
 
@@ -84,15 +107,7 @@ class ezpSessionHandlerPHP extends ezpSessionHandler
         return true;
     }
 
-    public function sessionStart()
-    {
-        //$name = eZUser::currentUser();
-        $something = session_start();
-        return $something;
-
-    }
-
-    /**
+   /**
      * reimp (not used in this handler)
      */
     public function gc( $maxLifeTime )
@@ -138,5 +153,42 @@ class ezpSessionHandlerPHP extends ezpSessionHandler
     {
         return false;
     }
+
+    /**
+     * Starts the session.
+     * Override this method if you need to delegate session start to an external system (e.g. Symfony stack in eZ Publish 5)
+     *
+     * @since 5.0
+     * @return bool
+     */
+    public function sessionStart()
+    {
+        if(
+            !( isset( $GLOBALS[ 'eZUserGlobalInstance_' ] ) &&
+            $GLOBALS[ 'eZUserGlobalInstance_' ] === false )
+        )
+        {
+            return session_start();
+        }
+    }
+
+    static protected function getUserHash()
+    {
+        $hash = '';
+
+        $currentUser = $GLOBALS[ 'eZUserGlobalInstance_' ];
+
+        if( $currentUser && $currentUser->ContentObjectID != 10 )
+        {
+            $userDetails = $currentUser->getUserCache();
+            $hashArray = array( $userDetails[ 'roles' ], $userDetails[ 'role_limitations' ] );
+
+            $hashArray[] = strtotime( 'today' );
+
+            $hash = md5( serialize( $hashArray ) );
+        }
+
+        return $hash;
+    }
 }
-?>
+
