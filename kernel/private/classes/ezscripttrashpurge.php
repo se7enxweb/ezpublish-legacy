@@ -72,7 +72,7 @@ class eZScriptTrashPurge
      *
      * @return bool True if the operation succeeded.
      */
-    public function run( $iterationLimit = 100, $sleep = 1 )
+    public function run( $iterationLimit = 100, $sleep = 1, $trashed = false )
     {
         if ( $iterationLimit === null )
         {
@@ -106,7 +106,7 @@ class eZScriptTrashPurge
         }
         eZUser::setCurrentlyLoggedInUser( $user, $userCreatorID );
 
-        $trashCount = eZContentObjectTrashNode::trashListCount( false );
+        $trashCount = eZContentObjectTrashNode::trashListCount(  array( 'Trashed'  => $trashed ) );
         if ( !$this->quiet )
         {
             $this->cli->output( "Found $trashCount object(s) in trash." );
@@ -123,7 +123,7 @@ class eZScriptTrashPurge
         while ( $trashCount > 0 )
         {
             $this->monitor( "iteration start" );
-            $trashList = eZContentObjectTrashNode::trashList( array( 'Limit'  => $iterationLimit ), false );
+            $trashList = eZContentObjectTrashNode::trashList( array( 'Limit'  => $iterationLimit, 'Trashed'  => $trashed ), false );
 
             $db->begin();
 
@@ -143,7 +143,7 @@ class eZScriptTrashPurge
                 return false;
             }
 
-            $trashCount = eZContentObjectTrashNode::trashListCount( false );
+            $trashCount = eZContentObjectTrashNode::trashListCount( array( 'Trashed'  => $trashed ) );
             if ( $trashCount > 0 )
             {
                 eZContentObject::clearCache();
