@@ -207,10 +207,6 @@ class eZStringType extends eZDataType
         return true;
     }
 
-    function storeClassAttribute( $attribute, $version )
-    {
-    }
-
     function storeDefinedClassAttribute( $attribute )
     {
     }
@@ -391,4 +387,3 @@ class eZStringType extends eZDataType
 
 eZDataType::register( eZStringType::DATA_TYPE_STRING, 'eZStringType' );
 
-?>
