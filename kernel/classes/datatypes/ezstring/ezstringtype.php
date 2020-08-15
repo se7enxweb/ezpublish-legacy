@@ -255,7 +255,7 @@ class eZStringType extends eZDataType
         $defaultValueName = $base . self::DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
-            $maxLenValue = $http->postVariable( $maxLenName );
+            $maxLenValue = (int) $http->postVariable( $maxLenName );
             $classAttribute->setAttribute( self::MAX_LEN_FIELD, $maxLenValue );
         }
         if ( $http->hasPostVariable( $defaultValueName ) )

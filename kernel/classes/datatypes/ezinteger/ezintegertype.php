@@ -249,6 +249,8 @@ class eZIntegerType extends eZDataType
 
     function validateClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
+        $returnValue = eZInputValidator::STATE_INVALID;
+
         $minValueName = $base . self::MIN_VALUE_VARIABLE . $classAttribute->attribute( "id" );
         $maxValueName = $base . self::MAX_VALUE_VARIABLE . $classAttribute->attribute( "id" );
         $defaultValueName = $base . self::DEFAULT_VALUE_VARIABLE . $classAttribute->attribute( "id" );
@@ -264,18 +266,17 @@ class eZIntegerType extends eZDataType
             $defaultValueValue = $http->postVariable( $defaultValueName );
             $defaultValueValue = str_replace(" ", "", $defaultValueValue );
 
-            if ( ( $minValueValue == "" ) && ( $maxValueValue == "") ){
-                return  eZInputValidator::STATE_ACCEPTED;
+            if ( ( $minValueValue == "" ) && ( $maxValueValue == "") )
+            {
+                $returnValue = eZInputValidator::STATE_ACCEPTED;
             }
             else if ( ( $minValueValue == "" ) && ( $maxValueValue !== "") )
             {
-                $max_state = $this->IntegerValidator->validate( $maxValueValue );
-                return  $max_state;
+                $returnValue = $this->IntegerValidator->validate( $maxValueValue );
             }
             else if ( ( $minValueValue !== "" ) && ( $maxValueValue == "") )
             {
-                $min_state = $this->IntegerValidator->validate( $minValueValue );
-                return  $min_state;
+                $returnValue = $this->IntegerValidator->validate( $minValueValue );
             }
             else
             {
@@ -284,25 +285,28 @@ class eZIntegerType extends eZDataType
                 if ( ( $min_state == eZInputValidator::STATE_ACCEPTED ) and
                      ( $max_state == eZInputValidator::STATE_ACCEPTED ) )
                 {
-                    if ($minValueValue <= $maxValueValue)
-                        return eZInputValidator::STATE_ACCEPTED;
+                    if ( $minValueValue <= $maxValueValue )
+                    {
+                        $returnValue = eZInputValidator::STATE_ACCEPTED;
+                    }
                     else
                     {
-                        $state = eZInputValidator::STATE_INTERMEDIATE;
                         eZDebug::writeNotice( "Integer minimum value great than maximum value." );
-                        return $state;
+                        $returnValue = eZInputValidator::STATE_INTERMEDIATE;
                     }
                 }
             }
 
-            if ($defaultValueValue == ""){
-                $default_state =  eZInputValidator::STATE_ACCEPTED;
+            if( $returnValue == eZInputValidator::STATE_ACCEPTED )
+            {
+                if( $defaultValueValue != "" )
+                {
+                    $returnValue = $this->IntegerValidator->validate( $defaultValueValue );
+                }
             }
-            else
-                $default_state = $this->IntegerValidator->validate( $defaultValueValue );
         }
 
-        return eZInputValidator::STATE_INVALID;
+        return $returnValue;
     }
 
     function fixupClassAttributeHTTPInput( $http, $base, $classAttribute )
