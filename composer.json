@@ -32,7 +32,7 @@
         "ezsystems/ezflow-ls-extension": "~5.3",
         "ezsystems/ezwt-ls-extension": "~5.3",
         "symfony/polyfill-php73":  "^1.9",
-        "mugoweb/ezfind": "^2019.03",
+        "mugoweb/ezfind": "^2020.04",
         "zetacomponents/archive": "~1.5",
         "zetacomponents/authentication": "~1.4",
         "zetacomponents/authentication-database-tiein": "~1.2",
@@ -53,7 +53,7 @@
         "zetacomponents/webdav": "~1.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
+        "phpunit/phpunit": "4.8.36",
         "zetacomponents/php-generator": "~1.1"
     },
     "autoload": {

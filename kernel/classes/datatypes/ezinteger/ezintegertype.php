@@ -276,7 +276,7 @@ class eZIntegerType extends eZDataType
                     }
                     else
                     {
-                        eZDebug::writeNotice( "Integer minimum value great than maximum value." );
+                        eZDebug::writeNotice( "Integer minimum value great than maximum value.", __METHOD__ );
                         $returnValue = eZInputValidator::STATE_INTERMEDIATE;
                     }
                 }
