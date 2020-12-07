@@ -516,12 +516,12 @@ class eZINI
         }
     }
 
-	/**
-	 * Generates the name for the cache file for loadCache
-	 *
-	 * @param false $placement
-	 * @return string
-	 */
+    /**
+     * Generates the name for the cache file for loadCache
+     *
+     * @param false $placement
+     * @return string
+     */
     protected function cacheFileName( $placement = false )
     {
         $cacheFileName = $this->FileName . '-' . $this->RootDir . '-' . $this->DirectAccess;
