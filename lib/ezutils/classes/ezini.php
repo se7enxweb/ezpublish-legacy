@@ -152,7 +152,16 @@ class eZINI
      * @param bool $load @since 4.5 Lets you disable automatic loading of ini values in
      *                   cases where changes on instance will be done first.
      */
-    public function __construct( $fileName = 'site.ini', $rootDir = '', $useTextCodec = null, $useCache = null, $useLocalOverrides = null, $directAccess = false, $addArrayDefinition = false, $load = true )
+    public function __construct(
+        $fileName = 'site.ini',
+        $rootDir = '',
+        $useTextCodec = null,
+        $useCache = null,
+        $useLocalOverrides = null,
+        $directAccess = false,
+        $addArrayDefinition = false,
+        $load = true
+    )
     {
         $this->Charset = 'utf8';
         if ( $fileName == '' )
@@ -161,7 +170,7 @@ class eZINI
             $rootDir = 'settings';
         if ( $useCache === null )
             $useCache = self::isCacheEnabled();
-        if ( eZINI::isNoCacheAdviced() )
+        if ( self::isNoCacheAdviced() )
         {
             $useCache = false;
         }
@@ -507,10 +516,12 @@ class eZINI
         }
     }
 
-    /*!
-      \protected
-      Generates cache name for loadCache
-    */
+	/**
+	 * Generates the name for the cache file for loadCache
+	 *
+	 * @param false $placement
+	 * @return string
+	 */
     protected function cacheFileName( $placement = false )
     {
         $cacheFileName = $this->FileName . '-' . $this->RootDir . '-' . $this->DirectAccess;
@@ -538,7 +549,7 @@ class eZINI
      * @access protected
      * @internal Please use {@link eZINI::load()} or {@link eZINI::loadPlacement()}
      * @param bool $reset Reset ini values on instance
-     * @param bool $placement Load cache for placment info, not the ini values themself.
+     * @param bool $placement Load cache for placement info, not the ini values themself.
      */
     function loadCache( $reset = true, $placement = false )
     {
@@ -1911,16 +1922,24 @@ class eZINI
      * @param bool $addArrayDefinition @deprecated since version 4.5, use "new eZINI()" (instance not used if true!)
      * @return eZINI
      */
-    static function instance( $fileName = 'site.ini', $rootDir = 'settings', $useTextCodec = null, $useCache = null, $useLocalOverrides = null, $directAccess = false, $addArrayDefinition = false )
+    static function instance(
+        $fileName = 'site.ini',
+        $rootDir = 'settings',
+        $useTextCodec = null,
+        $useCache = null,
+        $useLocalOverrides = null,
+        $directAccess = false,
+        $addArrayDefinition = false
+    )
     {
         if ( $addArrayDefinition !== false  || $directAccess !== false || $useTextCodec !== null || $useCache !== null )
         {
-            // Could have trown strict error here but will cause issues if ini system has not been setup yet..
+            // Could have thrown strict error here but will cause issues if ini system has not been setup yet..
             return new eZINI( $fileName, $rootDir, $useTextCodec, $useCache, $useLocalOverrides, $directAccess, $addArrayDefinition );
         }
 
         $key = "$rootDir-$fileName-$useLocalOverrides";
-        if ( !isset( self::$instances[$key] ) )
+        if ( !isset( self::$instances[ $key ] ) )
         {
             self::$instances[$key] = new eZINI( $fileName, $rootDir, $useTextCodec, $useCache, $useLocalOverrides, $directAccess, $addArrayDefinition );
         }
@@ -2168,4 +2187,3 @@ class eZINI
 
 }
 
-?>
