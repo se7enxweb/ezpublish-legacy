@@ -36,13 +36,19 @@
     still check if that file has been modified, while ignoring changes for
     any other file.
 
-    Note that independently of this setting, new INI override files will NEVER
-    be found automatically. You will need to clear at least the INI cache
-    when a new INI file override is added to the structure. Note that new files
-    are not affected, but this is an edge situation.
 */
 //define( 'EZP_INI_FILEMTIME_CHECK', false );
 
+/*
+    In order to use EZP_INI_FILENEW_CHECK, the constant EZP_INI_FILEMTIME_CHECK
+    has to be set to 'true'.
+    It only makes sense to enable (set to 'true') this setting in development
+    environments. On each page load, the system will make sure it has the correct
+    list of ini files. So there is no need to clear the cache when a developer
+    remove or adds an ini file.
+    The downside is a slower performance, the setup has to make more stat-calls.
+ */
+//define( 'EZP_INI_FILENEW_CHECK', true );
 
 /*
     KERNEL OVERRIDES

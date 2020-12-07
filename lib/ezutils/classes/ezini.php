@@ -77,6 +77,15 @@ class eZINI
     static protected $checkFileMtime = null;
 
     /**
+     * Set by the EZP_INI_FILENEW_CHECK constant (config.php). Force to always check for
+     * new ini files. Slower but handy in development environments. It avoids manual cache
+     * clearing.
+     *
+     * @var bool
+     */
+    static protected $checkFileNew = false;
+
+    /**
      * set EZP_INI_FILE_PERMISSION constant to the permissions you want saved
      * ini and cache files to have.
      *
@@ -193,6 +202,8 @@ class eZINI
             else
                 self::$checkFileMtime = true;
         }
+
+        self::$checkFileNew = defined('EZP_INI_FILENEW_CHECK') ? EZP_INI_FILENEW_CHECK : false;
 
         if ( self::$GlobalOverrideDirArray === null )
         {
@@ -586,33 +597,60 @@ class eZINI
             }
             else if ( self::$checkFileMtime === true || self::$checkFileMtime === $this->FileName )
             {
-                eZDebug::accumulatorStart( 'ini_check_mtime', 'Ini load', 'Check MTime' );
                 $currentTime = time();
                 $cacheCreatedTime = strtotime( $data['created'] );
                 $iniFile = $data['file'];// used by findInputFiles further down
                 $inputFiles = $data['files'];
-                foreach ( $inputFiles as $inputFile )
+
+                $iniFilesDiffer = false;
+                if( self::$checkFileNew )
                 {
-                    $fileTime = file_exists( $inputFile ) ? filemtime( $inputFile ) : false;
-                    if ( $fileTime === false )// Refresh cache & input files if file is gone
-                    {
-                        unset( $inputFiles );
-                        $data = false;
-                        $this->reset();
-                        break;
-                    }
-                    else if ( $fileTime > $currentTime )
-                    {
-                        eZDebug::writeError( 'Input file "' . $inputFile . '" has a timestamp higher then current time, ignoring to avoid infinite recursion!', __METHOD__ );
-                    }
-                    else if ( $fileTime > $cacheCreatedTime )// Refresh cache if file has been changed
-                    {
-                        $data = false;
-                        $this->reset();
-                        break;
-                    }
+                    $testFiles = array();
+                    eZDebug::accumulatorStart( 'ini_find_files', 'Ini load', 'Find INI Files' );
+                    $this->findInputFiles( $testFiles, $iniFile );
+                    eZDebug::accumulatorStop( 'ini_find_files' );
+
+                    $iniFilesDiffer = $testFiles != $inputFiles;
+
+                    // override $inputFiles making sure we always have the good ini file list
+                    $inputFiles = $testFiles;
                 }
-                eZDebug::accumulatorStop( 'ini_check_mtime' );
+
+                // No point checking modification time if ini file list changed
+                if( !$iniFilesDiffer )
+                {
+                    eZDebug::accumulatorStart( 'ini_check_mtime', 'Ini load', 'Check MTime' );
+                    foreach ( $inputFiles as $inputFile )
+                    {
+                        $fileTime = file_exists( $inputFile ) ? filemtime( $inputFile ) : false;
+                        if ( $fileTime === false )// Refresh cache & input files if file is gone
+                        {
+                            unset( $inputFiles );
+                            $data = false;
+                            $this->reset();
+                            break;
+                        }
+                        else if ( $fileTime > $currentTime )
+                        {
+                            eZDebug::writeError( 'Input file "' . $inputFile . '" has a timestamp higher then current time, ignoring to avoid infinite recursion!', __METHOD__ );
+                        }
+                        else if ( $fileTime > $cacheCreatedTime )// Refresh cache if file has been changed
+                        {
+                            $data = false;
+                            $this->reset();
+                            break;
+                        }
+                    }
+                    eZDebug::accumulatorStop( 'ini_check_mtime' );
+                }
+                else
+                {
+                    // Force reading the ini files again
+                    $data = false;
+                    $this->reset();
+
+                    // $inputFiles has the correct ini file list
+                }
             }
         }
 
