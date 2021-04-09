@@ -44,7 +44,6 @@
         "zetacomponents/event-log": "~1.5",
         "zetacomponents/feed": "~1.4",
         "zetacomponents/image-conversion": "~1.4",
-        "zetacomponents/mail": "~1.8",
         "zetacomponents/mvc-tools": "~1.2",
         "zetacomponents/mvc-authentication-tiein": "~1.1",
         "zetacomponents/persistent-object": "~1.8",
