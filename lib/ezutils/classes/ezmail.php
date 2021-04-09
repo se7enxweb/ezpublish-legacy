@@ -335,10 +335,10 @@ class eZMail
             $this->ContentType['boundary'] = $boundary;
 
         // if the body was already defined - set it again with to respect new content type
-		if( $this->BodyText )
-		{
-			$this->setBody( $this->BodyText );
-		}
+        if( $this->BodyText )
+        {
+            $this->setBody( $this->BodyText );
+        }
     }
 
     /*!
@@ -359,20 +359,20 @@ class eZMail
     */
     function setReceiverElements( $toElements )
     {
-    	$replace = true;
+        $replace = true;
         foreach ( $toElements as $index => $toElement )
         {
-			$name = isset( $toElement[ 'name' ] ) ? $toElement[ 'name' ] : '';
+            $name = isset( $toElement[ 'name' ] ) ? $toElement[ 'name' ] : '';
 
-			if( $replace )
-			{
-				$replace = false;
-				$this->setReceiver( $toElement[ 'email' ], $name );
-			}
-			else
-			{
-				$this->addReceiver( $toElement[ 'email' ], $name );
-			}
+            if( $replace )
+            {
+                $replace = false;
+                $this->setReceiver( $toElement[ 'email' ], $name );
+            }
+            else
+            {
+                $this->addReceiver( $toElement[ 'email' ], $name );
+            }
         }
     }
 
@@ -385,22 +385,22 @@ class eZMail
     */
     function setReceiver( $email, $name = false )
     {
-    	// change default value
-    	$name = $name ? $name : '';
-		try
-		{
-			$toAddress = new Address( $email, $name );
-			$this->Mail->to( $toAddress );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $toAddress = new Address( $email, $name );
+            $this->Mail->to( $toAddress );
 
-			$this->ReceiverElements = array( array(
-				'name' => $name,
-				'email' => $email
-			) );
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
+            $this->ReceiverElements = array( array(
+                'name' => $name,
+                'email' => $email
+            ) );
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -423,24 +423,24 @@ class eZMail
     */
     function addReceiver( $email, $name = false )
     {
-		// change default value
-		$name = $name ? $name : '';
+        // change default value
+        $name = $name ? $name : '';
 
-		try
-		{
-			$toAddress = new Address( $email, $name );
-			$this->Mail->addTo( $toAddress );
+        try
+        {
+            $toAddress = new Address( $email, $name );
+            $this->Mail->addTo( $toAddress );
 
-			$this->ReceiverElements[] =
-				[
-					'name' => $name,
-					'email' => $email
-				];
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
+            $this->ReceiverElements[] =
+                [
+                    'name' => $name,
+                    'email' => $email
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -450,22 +450,22 @@ class eZMail
     */
     function setReplyTo( $email, $name = false )
     {
-		// change default value
-		$name = $name ? $name : '';
-		try
-		{
-			$address = new Address( $email, $name );
-			$this->Mail->addReplyTo( $address );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->addReplyTo( $address );
 
-			$this->ReplyTo = array(
-				'name' => $name,
-				'email' => $email
-			);
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
+            $this->ReplyTo = array(
+                'name' => $name,
+                'email' => $email
+            );
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -475,22 +475,22 @@ class eZMail
     */
     function setSender( $email, $name = false )
     {
-		// change default value
-		$name = $name ? $name : '';
-		try
-		{
-			$address = new Address( $email, $name );
-			$this->Mail->sender( $address );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->sender( $address );
 
-			$this->From = array(
-				'name' => $name,
-				'email' => $email
-			);
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
+            $this->From = array(
+                'name' => $name,
+                'email' => $email
+            );
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -512,56 +512,56 @@ class eZMail
      */
     function setCcElements( $newCc )
     {
-		$replace = true;
+        $replace = true;
 
-		if( !empty( $newCc ) )
-		{
-			foreach ( $newCc as $element )
-			{
-				$name = isset( $element[ 'name' ] ) ? $element[ 'name' ] : '';
+        if( !empty( $newCc ) )
+        {
+            foreach ( $newCc as $element )
+            {
+                $name = isset( $element[ 'name' ] ) ? $element[ 'name' ] : '';
 
-				if( $replace )
-				{
-					$replace = false;
-					$this->setCc( $element[ 'email' ], $name );
-				}
-				else
-				{
-					$this->addCc( $element[ 'email' ], $name );
-				}
-			}
-		}
-		else
-		{
-			$headers = $this->Mail->getHeaders();
-			$headers->remove( 'cc' );
+                if( $replace )
+                {
+                    $replace = false;
+                    $this->setCc( $element[ 'email' ], $name );
+                }
+                else
+                {
+                    $this->addCc( $element[ 'email' ], $name );
+                }
+            }
+        }
+        else
+        {
+            $headers = $this->Mail->getHeaders();
+            $headers->remove( 'cc' );
 
-			$this->CcElements = [];
-		}
+            $this->CcElements = [];
+        }
     }
 
     function setCc( $email, $name = false )
-	{
-		// change default value
-		$name = $name ? $name : '';
-		try
-		{
-			$address = new Address( $email, $name );
-			$this->Mail->cc( $address );
+    {
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->cc( $address );
 
-			$this->CcElements =
-				[
-					[
-						'name' => $name,
-						'email' => $email,
-					]
-				];
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
-	}
+            $this->CcElements =
+                [
+                    [
+                        'name' => $name,
+                        'email' => $email,
+                    ]
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
+    }
 
     /*!
       Adds a new Cc address.
@@ -570,23 +570,23 @@ class eZMail
     */
     function addCc( $email, $name = false )
     {
-		// change default value
-		$name = $name ? $name : '';
-		try
-		{
-			$address = new Address( $email, $name );
-			$this->Mail->addCc( $address );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->addCc( $address );
 
-			$this->CcElements[] =
-				[
-					'name' => $name,
-					'email' => $email,
-				];
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
+            $this->CcElements[] =
+                [
+                    'name' => $name,
+                    'email' => $email,
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -596,80 +596,80 @@ class eZMail
      */
     function setBccElements( $newBcc )
     {
-		$replace = true;
-		if( !empty( $newBcc ) )
-		{
-			foreach ( $newBcc as $element )
-			{
-				$name = isset( $element[ 'name' ] ) ? $element[ 'name' ] : '';
+        $replace = true;
+        if( !empty( $newBcc ) )
+        {
+            foreach ( $newBcc as $element )
+            {
+                $name = isset( $element[ 'name' ] ) ? $element[ 'name' ] : '';
 
-				if( $replace )
-				{
-					$replace = false;
-					$this->setBcc( $element[ 'email' ], $name );
-				}
-				else
-				{
-					$this->addBcc( $element[ 'email' ], $name );
-				}
-			}
-		}
-		else
-		{
-			$headers = $this->Mail->getHeaders();
-			$headers->remove( 'bcc' );
+                if( $replace )
+                {
+                    $replace = false;
+                    $this->setBcc( $element[ 'email' ], $name );
+                }
+                else
+                {
+                    $this->addBcc( $element[ 'email' ], $name );
+                }
+            }
+        }
+        else
+        {
+            $headers = $this->Mail->getHeaders();
+            $headers->remove( 'bcc' );
 
-			$this->BccElements = [];
-		}
+            $this->BccElements = [];
+        }
     }
 
-	function setBcc( $email, $name = false )
-	{
-		// change default value
-		$name = $name ? $name : '';
-		try
-		{
-			$address = new Address( $email, $name );
-			$this->Mail->bcc( $address );
+    function setBcc( $email, $name = false )
+    {
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->bcc( $address );
 
-			$this->BccElements =
-				[
-					[
-						'name' => $name,
-						'email' => $email,
-					]
-				];
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
-	}
+            $this->BccElements =
+                [
+                    [
+                        'name' => $name,
+                        'email' => $email,
+                    ]
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
+    }
 
-	/*!
-	  Adds a new Bcc address.
+    /*!
+      Adds a new Bcc address.
 
-	  \deprecated
-	*/
+      \deprecated
+    */
     function addBcc( $email, $name = false )
     {
-		// change default value
-		$name = $name ? $name : '';
-		try
-		{
-			$address = new Address( $email, $name );
-			$this->Mail->addBcc( $address );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->addBcc( $address );
 
-			$this->BccElements[] =
-				[
-					'name' => $name,
-					'email' => $email,
-				];
-		}
-		catch( Exception $e )
-		{
-			eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
-		}
+            $this->BccElements[] =
+                [
+                    'name' => $name,
+                    'email' => $email,
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -789,7 +789,7 @@ class eZMail
     */
     function setSubject( $newSubject )
     {
-		$newSubject = trim( $newSubject );
+        $newSubject = trim( $newSubject );
 
         $this->Mail->subject = $newSubject;
         $this->Mail->subjectCharset = $this->usedCharset();
@@ -816,21 +816,21 @@ class eZMail
     */
     function setBody( $newBody )
     {
-		switch( $this->ContentType[ 'type' ] )
-		{
-			case 'text/html':
-			{
-				$this->Mail->text( '', '' );
-				$this->Mail->html( $newBody );
-			}
-			break;
+        switch( $this->ContentType[ 'type' ] )
+        {
+            case 'text/html':
+            {
+                $this->Mail->text( '', '' );
+                $this->Mail->html( $newBody );
+            }
+            break;
 
-			default:
-			{
-				$this->Mail->html( '', '' );
-				$this->Mail->text( $newBody );
-			}
-		}
+            default:
+            {
+                $this->Mail->html( '', '' );
+                $this->Mail->text( $newBody );
+            }
+        }
 
         $this->BodyText = $newBody;
     }

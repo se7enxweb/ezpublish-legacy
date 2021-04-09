@@ -32,21 +32,21 @@ class eZSMTPTransport extends eZMailTransport
         {
             $emailSender = $ini->variable( 'MailSettings', 'EmailSender' );
             if ( !$emailSender )
-			{
-				$emailSender = $ini->variable( 'MailSettings', 'AdminEmail' );
-			}
+            {
+                $emailSender = $ini->variable( 'MailSettings', 'AdminEmail' );
+            }
 
             eZMail::extractEmail( $emailSender, $emailSenderAddress, $emailSenderName );
 
             if ( !eZMail::validate( $emailSenderAddress ) )
-			{
-				$emailSender = false;
-			}
+            {
+                $emailSender = false;
+            }
 
             if ( $emailSender )
-			{
-				$mail->setSenderText( $emailSender );
-			}
+            {
+                $mail->setSenderText( $emailSender );
+            }
         }
 
         $excludeHeaders = $ini->variable( 'MailSettings', 'ExcludeHeaders' );
@@ -70,12 +70,12 @@ class eZSMTPTransport extends eZMailTransport
         }
 
         $transport = Transport::fromDsn( self::generateDsn() );
-		$mailer = new Mailer( $transport );
+        $mailer = new Mailer( $transport );
 
         try
         {
-			$mailer->send( $mail->Mail );
-			return true;
+            $mailer->send( $mail->Mail );
+            return true;
         }
         catch ( TransportExceptionInterface $e )
         {
@@ -92,39 +92,39 @@ class eZSMTPTransport extends eZMailTransport
         $ini = eZINI::instance();
 
         $scheme = 'smtp';
-		$encryption = $ini->variable( 'MailSettings', 'TransportConnectionType' );
-		if( $encryption )
-		{
-			$scheme = 'smtps';
-		}
+        $encryption = $ini->variable( 'MailSettings', 'TransportConnectionType' );
+        if( $encryption )
+        {
+            $scheme = 'smtps';
+        }
 
-		$user = $ini->variable( 'MailSettings', 'TransportUser' );
+        $user = $ini->variable( 'MailSettings', 'TransportUser' );
         $password = $ini->variable( 'MailSettings', 'TransportPassword' );
         $port = $ini->variable( 'MailSettings', 'TransportPort' );
 
         // Build options array
         $options = [
-			'verify_peer' => 0,
-		];
+            'verify_peer' => 0,
+        ];
 
-		$localDomain = $ini->variable( 'MailSettings', 'SenderHost' );
+        $localDomain = $ini->variable( 'MailSettings', 'SenderHost' );
         if( $localDomain )
-		{
-			$options[ 'local_domain' ] = $localDomain;
-		}
+        {
+            $options[ 'local_domain' ] = $localDomain;
+        }
 
         //Example smtp://user:pass@smtp.example.com:port?encryption=tls
         $dsn =
-			$scheme . '://' .
-			( $user ? rawurlencode( $user ) : '' ) .
-			( $password ? ':' . rawurlencode( $password ) : '' ) .
-			( $ini->variable( 'MailSettings', 'TransportServer' ) ).
-			( $port ? ':' . $port : '' );
+            $scheme . '://' .
+            ( $user ? rawurlencode( $user ) : '' ) .
+            ( $password ? ':' . rawurlencode( $password ) : '' ) .
+            ( $ini->variable( 'MailSettings', 'TransportServer' ) ).
+            ( $port ? ':' . $port : '' );
 
         if( !empty( $options ) )
-		{
-			$dsn .= '?' . http_build_query( $options );
-		}
+        {
+            $dsn .= '?' . http_build_query( $options );
+        }
 
         return $dsn;
     }
