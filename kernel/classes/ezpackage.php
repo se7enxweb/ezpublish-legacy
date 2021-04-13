@@ -1069,25 +1069,13 @@ class eZPackage
                 eZDir::copy( $dir, $destDir );
         }
 
-        $tarArchivePath = $temporaryExportPath . '/archive.tmp';
-        $tarArchive = ezcArchive::open( $tarArchivePath, ezcArchive::TAR_USTAR );
-        $tarArchive->truncate();
 
-        $prefix = $tempPath . '/';
-        $fileList = array();
-        eZDir::recursiveList( $tempPath, $tempPath, $fileList );
+        $tarArchivePath = $temporaryExportPath . '/' . pathinfo( $archivePath, PATHINFO_FILENAME ) . '.tar';
+        $tarArchive = new PharData( $tarArchivePath );
 
-        foreach ( $fileList as $fileInfo )
-        {
-            $path = $fileInfo['type'] === 'dir' ?
-                $fileInfo['path'] . '/' . $fileInfo['name'] . '/' :
-                $fileInfo['path'] . '/' . $fileInfo['name'];
-            $tarArchive->append( array( $path ), $prefix );
-        }
+        $tarArchive->buildFromDirectory( $tempPath );
 
-        $tarArchive->close();
-
-        copy( $tarArchivePath, "compress.zlib://$archivePath" );
+        $tarArchive->compress( Phar::GZ, 'ezpkg' );
 
         unlink( $tarArchivePath );
 
