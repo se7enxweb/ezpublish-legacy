@@ -1069,7 +1069,6 @@ class eZPackage
                 eZDir::copy( $dir, $destDir );
         }
 
-
         $tarArchivePath = $temporaryExportPath . '/' . pathinfo( $archivePath, PATHINFO_FILENAME ) . '.tar';
         $tarArchive = new PharData( $tarArchivePath );
 
