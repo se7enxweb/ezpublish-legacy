@@ -261,7 +261,7 @@ class eZMail
     */
     function contentCharset()
     {
-        return $this->ContentType['charset'];
+        return $this->ContentType[ 'charset' ] ?? null;
     }
 
     /*!
@@ -307,7 +307,10 @@ class eZMail
     */
     function setMIMEVersion( $version )
     {
-        $this->Mail->setHeader( 'MIME-Version', $version );
+		$headers = $this->Mail->getHeaders();
+		$headers->addHeader( 'MIME-Version', $version );
+		$this->Mail->setHeaders( $headers );
+
         $this->MIMEVersion = $version;
     }
 
@@ -348,7 +351,10 @@ class eZMail
     */
     function setUserAgent( $agent )
     {
-        $this->Mail->setHeader( 'User-Agent', $agent );
+    	$headers = $this->Mail->getHeaders();
+    	$headers->addHeader( 'User-Agent', $agent );
+        $this->Mail->setHeaders( $headers );
+
         $this->UserAgent = $agent;
     }
 
@@ -689,7 +695,10 @@ class eZMail
     */
     function addExtraHeader( $headerName, $headerValue )
     {
-        $this->Mail->setHeader( $headerName, $headerValue );
+		$headers = $this->Mail->getHeaders();
+		$headers->addHeader( $headerName, $headerValue );
+		$this->Mail->setHeaders( $headers );
+
         return $this->ExtraHeaders[] = array( 'name' => $headerName,
                                               'content' => $headerValue );
     }
@@ -701,19 +710,16 @@ class eZMail
     */
     function setExtraHeader( $headerName, $headerValue )
     {
-        $this->Mail->setHeader( $headerName, $headerValue );
-        for ( $i = 0; $i < count( $this->ExtraHeaders ); ++$i )
-        {
-            $extraHeader =& $this->ExtraHeaders[$i];
-            if ( isset( $extraHeader['name'] ) and
-                 $extraHeader['name'] == $headerName )
-            {
-                $extraHeader = array( 'name' => $headerName,
-                                      'content' => $headerValue );
-                return true;
-            }
-        }
-        $this->addExtraHeader( $headerName, $headerValue );
+    	foreach( $this->ExtraHeaders as $index => $existingHeader )
+		{
+			if ( isset( $existingHeader[ 'name' ] ) &&
+				$existingHeader['name'] == $headerName )
+			{
+				unset( $existingHeader[ $index ] );
+			}
+		}
+
+		$this->addExtraHeader( $headerName, $headerValue );
     }
 
     /*!
