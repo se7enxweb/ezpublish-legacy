@@ -175,7 +175,7 @@ class eZStepSiteTypes extends eZStepInstaller
         $archiveName = $this->downloadFile( $packageUrl, /* $outDir = */ eZStepSiteTypes::tempDir() );
         if ( $archiveName === false )
         {
-            eZDebug::writeWarning( "Download of package '$packageName' from '$packageUrl' failed: $this->ErrorMsg", __METHOD__ );
+            eZDebug::writeWarning( "Download of package '$packageName' from '$packageUrl' failed: $this->ErrorMsg" );
             $this->ErrorMsg = ezpI18n::tr( 'design/standard/setup/init',
                                       'Download of package \'%pkg\' failed. You may upload the package manually.',
                                       false, array( '%pkg' => $packageName ) );
@@ -381,7 +381,11 @@ class eZStepSiteTypes extends eZStepInstaller
             $sitePackageName = $sitePackageInfo;
 
             $package = eZPackage::fetch( $sitePackageName, false, false, false );
-            $this->ErrorMsg = ezpI18n::tr( 'design/standard/setup/init', 'Invalid package' ) . '.';
+
+            if ( !is_object( $package ) )
+                $this->ErrorMsg = ezpI18n::tr( 'design/standard/setup/init', 'Invalid package' ) . '.';
+            else
+                $downloaded = true;
         }
 
         // Verify package.
@@ -390,7 +394,7 @@ class eZStepSiteTypes extends eZStepInstaller
 
         // Download packages that the site package requires.
         $downloadDependandPackagesResult = $this->downloadDependantPackages( $package );
-        return $downloadDependandPackagesResult == false ? false : !$downloaded;
+        return $downloadDependandPackagesResult == false ? false : $downloaded;
     }
 
     function init()
