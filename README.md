@@ -95,5 +95,3 @@ If you discover a security issue, please responsibly report such issues.
 Where to get more help
 ----------------------
 eZ Publish documentation: [https://ezpublishdoc.mugo.ca/eZ-Publish/index.html](https://ezpublishdoc.mugo.ca/eZ-Publish/index.html)
-
-eZ Publish forums: http://share.ez.no/forums/
