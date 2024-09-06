@@ -72,6 +72,7 @@ class eZContentObjectState extends eZPersistentObject
      */
     public static function fetchById( $id )
     {
+        $id = (int)$id;
         $states = self::fetchByConditions( array( "ezcobj_state.id=$id" ), 1, 0 );
         $state = count( $states ) > 0 ? $states[0] : false;
         return $state;
@@ -150,6 +151,7 @@ class eZContentObjectState extends eZPersistentObject
      */
     public static function fetchByGroup( $groupID, $limit = false, $offset = false )
     {
+        $groupID = (int)$groupID;
         return self::fetchByConditions( array( "ezcobj_state_group.id=$groupID" ), $limit, $offset );
     }
 

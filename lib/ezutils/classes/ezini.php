@@ -316,7 +316,7 @@ class eZINI
      * @param string parameter parameter name
      * @return bool True if the the parameter is set.
      */
-    static function parameterSet( $fileName = 'site.ini', $rootDir = 'settings', &$section, &$parameter )
+    static function parameterSet( $fileName = 'site.ini', $rootDir = 'settings', &$section = null, &$parameter = null)
     {
         if ( !eZINI::exists( $fileName, $rootDir ) )
             return false;
