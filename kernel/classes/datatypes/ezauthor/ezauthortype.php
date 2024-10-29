@@ -80,7 +80,7 @@ class eZAuthorType extends eZDataType
 
                     }
                     $isValidate =  eZMail::validate( $email );
-                    if ( ! $isValidate )
+                    if ( trim( $email ) != '' && ! $isValidate )
                     {
                         $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
                                                                              'The email address is not valid.' ) );

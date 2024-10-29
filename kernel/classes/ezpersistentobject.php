@@ -517,7 +517,8 @@ class eZPersistentObject
                     // Note: for more colherence, we might use NULL for sql strings if the php value is NULL and not an empty sring
                     //       but to keep compatibility with ez db, where most string columns are "not null default ''",
                     //       and code feeding us a php null value without meaning it, we do not.
-                    $use_values_hash[$key] = "'" . $db->escapeString( $value ) . "'";
+                    //       We need to make sure $value is string before calling $db->escapeString in PHP 8
+                    $use_values_hash[$key] = "'" . (is_string($value) ? $db->escapeString( $value ) : '') . "'";
                 }
             }
             foreach ( $doNotEscapeFields as $key )
@@ -1437,6 +1438,82 @@ class eZPersistentObject
 
         return $attrName;
     }
+
+    public $ID;
+    public $ContentObjectID;
+    public $SectionID;
+    public $OwnerID;
+    public $ClassID;
+    public $Published;
+    public $Modified;
+    public $CurrentVersion;
+    public $Status;
+    public $RemoteID;
+    public $LanguageMask;
+    public $InitialLanguageID;
+    public $NodeID;
+    public $ParentNodeID;
+    public $MainNodeID;
+    public $ContentObjectVersion;
+    public $ContentObjectIsPublished;
+    public $Depth;
+    public $SortField;
+    public $SortOrder;
+    public $Priority;
+    public $ModifiedSubNode;
+    public $PathString;
+    public $PathIdentificationString;
+    public $IsHidden;
+    public $IsInvisible;
+    public $UserID;
+    public $Name;
+    public $Locale;
+    public $Identifier;
+    public $NavigationPartIdentifier;
+    public $SerializedDescriptionList;
+    public $URLAliasName;
+    public $AlwaysAvailable;
+    public $CanTranslate;
+    public $DataInt1;
+    public $DataInt2;
+    public $DataInt3;
+    public $DataInt4;
+    public $DataFloat1;
+    public $DataFloat2;
+    public $DataFloat3;
+    public $DataFloat4;
+    public $DataText1;
+    public $DataText2;
+    public $DataText3;
+    public $DataText4;
+    public $DataText5;
+    public $SerializedDataText;
+    public $Category;
+    public $PolicyID;
+    public $Values;
+    public $Created;
+    public $CurrencyCode;
+    public $ProductCollectionID;
+    public $ItemCount;
+    public $Price;
+    public $IsVATIncluded;
+    public $VATValue;
+    public $DiscountValue;
+    public $Email;
+    public $IsTemporary;
+    public $IsArchived;
+    public $IsActive;
+    public $OrderID;
+    public $ModifierID;
+    public $Code;
+    public $Symbol;
+    public $AutoRateValue;
+    public $CustomRateValue;
+    public $RateFactor;
+    public $Main;
+    public $MementoKey;
+    public $MainKey;
+    public $WorkflowEventPos;
 }
 
 ?>
