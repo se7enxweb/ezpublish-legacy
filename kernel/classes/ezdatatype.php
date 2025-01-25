@@ -163,7 +163,7 @@ class eZDataType
             if ( !isset( $GLOBALS["eZDataTypeObjects"][$dataTypeString] ) ||
                  get_class( $GLOBALS["eZDataTypeObjects"][$dataTypeString] ) != $className )
             {
-                $GLOBALS["eZDataTypeObjects"][$dataTypeString] = new $className();
+                $GLOBALS["eZDataTypeObjects"][$dataTypeString] = new $className( $dataTypeString, $className );
             }
             return $GLOBALS["eZDataTypeObjects"][$dataTypeString];
         }
@@ -283,6 +283,16 @@ class eZDataType
      \sa insertSimpleString()
     */
     function isSimpleStringInsertionSupported()
+    {
+        return false;
+    }
+
+    /**
+     * Indicates if the datatype handles relations
+     *
+     * @return bool
+     */
+    public function isRelationType()
     {
         return false;
     }

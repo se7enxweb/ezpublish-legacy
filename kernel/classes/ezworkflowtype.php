@@ -96,7 +96,7 @@ class eZWorkflowType
             {
                 if ( class_exists( $class_name ) )
                 {
-                    $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name();
+                    $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name( $typeString, $class_name );
                 }
                 else
                 {
@@ -126,7 +126,7 @@ class eZWorkflowType
                 {
                     if ( class_exists( $class_name ) )
                     {
-                        $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name();
+                        $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name( $typeString, $class_name );
                     }
                     else
                     {

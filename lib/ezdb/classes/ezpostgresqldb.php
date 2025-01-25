@@ -293,19 +293,19 @@ class eZPostgreSQLDB extends eZDBInterface
                 return false;
             }
 
-            if ( pg_numrows( $result ) > 0 )
+            if ( pg_num_rows( $result ) > 0 )
             {
                 eZDebug::accumulatorStart( 'postgresql_loop', 'postgresql_total', 'Looping result' );
                 if ( !is_string( $column ) )
                 {
-                    for($i = 0; $i < pg_numrows($result); $i++)
+                    for($i = 0; $i < pg_num_rows($result); $i++)
                     {
                         $retArray[$i + $offset] = pg_fetch_array( $result, $i, PGSQL_ASSOC );
                     }
                 }
                 else
                 {
-                    for ($i = 0; $i < pg_numrows( $result ); $i++ )
+                    for ($i = 0; $i < pg_num_rows( $result ); $i++ )
                     {
                         $tmp_row = pg_fetch_array( $result, $i, PGSQL_ASSOC );
                         $retArray[$i + $offset] =& $tmp_row[$column];
@@ -613,7 +613,7 @@ class eZPostgreSQLDB extends eZDBInterface
     function escapeString( $str )
     {
         $str = str_replace("\0", '', $str);
-        $str = pg_escape_string( $str );
+        $str = pg_escape_string( $this->DBConnection, $str );
         return $str;
     }
 
@@ -678,7 +678,7 @@ class eZPostgreSQLDB extends eZDBInterface
         {
             $rows = $this->arrayQuery( "SELECT pg_class.relname AS table, pg_attribute.attname AS column
                 FROM pg_class,pg_attribute,pg_attrdef
-                WHERE pg_attrdef.adsrc LIKE 'nextval(%'
+                WHERE pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) LIKE 'nextval(%'
                     AND pg_attrdef.adrelid=pg_attribute.attrelid
                     AND pg_attrdef.adnum=pg_attribute.attnum
                     AND pg_attribute.attrelid=pg_class.oid" );
